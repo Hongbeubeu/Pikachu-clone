@@ -12,7 +12,12 @@ namespace Pokemon
         [SerializeField] private Vector2Int gridPosition;
         public int Id => id;
         public Vector3 Position => transform.position;
-        public Vector2Int GridPosition => gridPosition;
+
+        public Vector2Int GridPosition
+        {
+            get => gridPosition;
+            set => gridPosition = value;
+        }
 
         public void Setup(Sprite sprite, int id, Vector2Int gridPosition)
         {

@@ -16175,13 +16175,13 @@ TextureImporter:
       Pokemon_Icon_52: 1411981963
       Pokemon_Icon_295: 969186133
       Pokemon_Icon_376: 1640565330
-      Pokemon_Icon_608: 1876398874
-      Pokemon_Icon_568: -1410763099
-      Pokemon_Icon_492: -1737084191
       Pokemon_Icon_737: -2066434158
+      Pokemon_Icon_568: -1410763099
       Pokemon_Icon_622: -328604688
-      Pokemon_Icon_271: 2112021412
       Pokemon_Icon_743: 1262861107
+      Pokemon_Icon_492: -1737084191
+      Pokemon_Icon_271: 2112021412
+      Pokemon_Icon_608: 1876398874
       Pokemon_Icon_485: 1242513806
       Pokemon_Icon_20: 656414749
       Pokemon_Icon_572: 888557980
@@ -16273,8 +16273,8 @@ TextureImporter:
       Pokemon_Icon_386: -1896364226
       Pokemon_Icon_599: 131757493
       Pokemon_Icon_6: -1694377273
-      Pokemon_Icon_84: -90086012
       Pokemon_Icon_126: -1466968008
+      Pokemon_Icon_84: -90086012
       Pokemon_Icon_563: 1601462471
       Pokemon_Icon_758: -1193508352
       Pokemon_Icon_447: -303240248
@@ -16378,8 +16378,8 @@ TextureImporter:
       Pokemon_Icon_716: 1878254901
       Pokemon_Icon_695: -903025552
       Pokemon_Icon_112: -384496571
-      Pokemon_Icon_196: 1349467175
       Pokemon_Icon_427: 376464713
+      Pokemon_Icon_196: 1349467175
       Pokemon_Icon_67: 1559831829
       Pokemon_Icon_12: -1273985094
       Pokemon_Icon_506: -2014717548
@@ -16396,10 +16396,10 @@ TextureImporter:
       Pokemon_Icon_620: 495040388
       Pokemon_Icon_441: -602081115
       Pokemon_Icon_106: -1174116194
-      Pokemon_Icon_305: -1947727504
       Pokemon_Icon_678: 308299131
-      Pokemon_Icon_635: 57608316
+      Pokemon_Icon_305: -1947727504
       Pokemon_Icon_664: 1061589000
+      Pokemon_Icon_635: 57608316
       Pokemon_Icon_50: -440249399
       Pokemon_Icon_546: 2074598882
       Pokemon_Icon_63: 1182061855
@@ -16423,8 +16423,8 @@ TextureImporter:
       Pokemon_Icon_79: 1700655492
       Pokemon_Icon_550: 130453758
       Pokemon_Icon_311: 1054494901
-      Pokemon_Icon_28: -1739982092
       Pokemon_Icon_481: -309048816
+      Pokemon_Icon_28: -1739982092
       Pokemon_Icon_601: 1460692821
       Pokemon_Icon_288: 1379431233
       Pokemon_Icon_238: 1918394784
@@ -16476,6 +16476,7 @@ TextureImporter:
       Pokemon_Icon_353: 1843115646
       Pokemon_Icon_159: -1691983922
       Pokemon_Icon_141: -374160090
+      Pokemon_Icon_46: -1830074501
       Pokemon_Icon_257: 660934341
       Pokemon_Icon_595: 166186115
       Pokemon_Icon_89: -979691620
@@ -16489,7 +16490,6 @@ TextureImporter:
       Pokemon_Icon_172: -360884958
       Pokemon_Icon_446: 1630939401
       Pokemon_Icon_313: -313142467
-      Pokemon_Icon_46: -1830074501
       Pokemon_Icon_392: 1211313648
       Pokemon_Icon_269: -185087180
       Pokemon_Icon_456: -1672639743
@@ -16524,9 +16524,9 @@ TextureImporter:
       Pokemon_Icon_42: -1706672892
       Pokemon_Icon_162: -41501322
       Pokemon_Icon_613: -1686772092
-      Pokemon_Icon_287: -1991754700
       Pokemon_Icon_407: -780630690
       Pokemon_Icon_626: 1039006637
+      Pokemon_Icon_287: -1991754700
       Pokemon_Icon_534: -1834152165
       Pokemon_Icon_27: 613514596
       Pokemon_Icon_127: -2050162185
@@ -16561,9 +16561,9 @@ TextureImporter:
       Pokemon_Icon_594: 1620530237
       Pokemon_Icon_66: 1789161670
       Pokemon_Icon_215: 31240018
-      Pokemon_Icon_487: -403145761
       Pokemon_Icon_631: -188207456
       Pokemon_Icon_225: 1934653513
+      Pokemon_Icon_487: -403145761
       Pokemon_Icon_381: 1563915388
       Pokemon_Icon_480: -2060519757
       Pokemon_Icon_118: 1401885633
@@ -16682,8 +16682,8 @@ TextureImporter:
       Pokemon_Icon_503: -1492972781
       Pokemon_Icon_349: -741228166
       Pokemon_Icon_261: 34009041
-      Pokemon_Icon_424: -1259790427
       Pokemon_Icon_580: 734253042
+      Pokemon_Icon_424: -1259790427
       Pokemon_Icon_252: -1196076179
       Pokemon_Icon_157: -662212804
       Pokemon_Icon_501: -919788882
@@ -16707,9 +16707,9 @@ TextureImporter:
       Pokemon_Icon_132: 1901487144
       Pokemon_Icon_87: -475940412
       Pokemon_Icon_114: -1720347825
-      Pokemon_Icon_149: -708621333
-      Pokemon_Icon_40: 928212592
       Pokemon_Icon_439: -1355075213
+      Pokemon_Icon_40: 928212592
+      Pokemon_Icon_149: -708621333
       Pokemon_Icon_617: 1914906829
       Pokemon_Icon_174: -1139868087
       Pokemon_Icon_741: 1400421788

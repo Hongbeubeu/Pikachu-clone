@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using DG.Tweening;
 using EasyButtons;
 using Lean.Touch;
 using UnityEditor;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Pokemon
 {
@@ -24,6 +27,7 @@ namespace Pokemon
         [SerializeField] private List<Tile> tiles = new();
         private Tile tileHolded;
         private bool isConnecting;
+        private float matchedCount = 0;
 
         private void OnEnable()
         {
@@ -67,6 +71,29 @@ namespace Pokemon
                 }
 
                 position.y += cellSize;
+            }
+        }
+
+        private bool isShuffling = false;
+
+        [SerializeField] private float shuffleTime = 0.3f;
+
+        [Button]
+        private void ShuffleBoard()
+        {
+            isShuffling = true;
+            DOVirtual.DelayedCall(shuffleTime, () => { isShuffling = false; });
+            var tempTiles = tiles.Where(t => t != null).ToList();
+            tempTiles.Shuffle();
+            for (var i = 0; i < tiles.Count; i++)
+            {
+                if (tiles[i] == null) continue;
+
+                tiles[i] = tempTiles[0];
+                var gridPosition = new Vector2Int(i % boardSize.x, i / boardSize.x);
+                tiles[i].GridPosition = gridPosition;
+                tiles[i].transform.DOMove(GridPositionToWorldPosition(gridPosition), shuffleTime);
+                tempTiles.RemoveAt(0);
             }
         }
 
@@ -122,7 +149,8 @@ namespace Pokemon
 
         private void HandleFingerTap(LeanFinger finger)
         {
-            if (isConnecting) return;
+            if (isConnecting || isShuffling) return;
+
             var worldPosition = _camera.ScreenToWorldPoint(finger.ScreenPosition);
 
             if (WorldPositionToGridPosition(worldPosition, out var gridPosition))
@@ -191,6 +219,13 @@ namespace Pokemon
             tileHolded = null;
             lineRenderer.positionCount = 0;
             isConnecting = false;
+            matchedCount += 2;
+
+            if (matchedCount != tiles.Count) yield break;
+
+            _shiftIndex = Random.Range(0, pokemonIcons.Length);
+            matchedCount = 0;
+            Generate();
         }
 
         private bool CanMatch(Tile fromTile, Tile toTile, out List<Vector2Int> path)
