@@ -191,17 +191,17 @@ namespace QuickEditor
                 case BuildTarget.StandaloneWindows: return BuildTargetGroup.Standalone; //Build a Windows standalone.
                 case BuildTarget.iOS: return BuildTargetGroup.iOS; //Build an iOS player.
                 case BuildTarget.Android: return BuildTargetGroup.Android; //Build an Android .apk standalone app.
-                case BuildTarget.StandaloneLinux: return BuildTargetGroup.Standalone; //Build a Linux standalone.
+                // case BuildTarget.StandaloneLinux: return BuildTargetGroup.Standalone; //Build a Linux standalone.
                 case BuildTarget.StandaloneWindows64: return BuildTargetGroup.Standalone; //Build a Windows 64 - bit standalone.
                 case BuildTarget.WebGL: return BuildTargetGroup.WebGL; //WebGL.
                 case BuildTarget.WSAPlayer: return BuildTargetGroup.WSA; //Build an Windows Store Apps player.
                 case BuildTarget.StandaloneLinux64: return BuildTargetGroup.Standalone; //Build a Linux 64 - bit standalone.
-                case BuildTarget.StandaloneLinuxUniversal: return BuildTargetGroup.Standalone; //Build a Linux universal standalone.
-                case BuildTarget.Tizen: return BuildTargetGroup.Tizen; //Build a Tizen player.
-                case BuildTarget.PSP2: return BuildTargetGroup.PSP2; //Build a PS Vita Standalone.
+                // case BuildTarget.StandaloneLinuxUniversal: return BuildTargetGroup.Standalone; //Build a Linux universal standalone.
+                // case BuildTarget.Tizen: return BuildTargetGroup.Tizen; //Build a Tizen player.
+                // case BuildTarget.PSP2: return BuildTargetGroup.PSP2; //Build a PS Vita Standalone.
                 case BuildTarget.PS4: return BuildTargetGroup.PS4; //Build a PS4 Standalone.
                 case BuildTarget.XboxOne: return BuildTargetGroup.XboxOne; //Build a Xbox One Standalone.
-                case BuildTarget.N3DS: return BuildTargetGroup.N3DS; //Build to Nintendo 3DS platform.
+                // case BuildTarget.N3DS: return BuildTargetGroup.N3DS; //Build to Nintendo 3DS platform.
 
 #if !UNITY_2018_1_OR_NEWER
                 case BuildTarget.WiiU: return BuildTargetGroup.WiiU; //Build a Wii U standalone.
