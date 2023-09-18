@@ -26,6 +26,11 @@ namespace Pokemon
             this.gridPosition = gridPosition;
         }
 
+        public void SetActive(bool isActive)
+        {
+            gameObject.SetActive(isActive);
+        }
+        
         private void OnSelect()
         {
             isSelected = true;
