@@ -586,7 +586,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baed452ce808f024ead44e09d432f9d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shiftDirection: {x: 0, y: -1}
+  _shiftDirection: 5
   _shiftIndex: 280
   _timeDelayDisappear: 0.3
   _camera: {fileID: 774251656}
@@ -1356,6 +1356,8 @@ MonoBehaviour:
   boardSize: {x: 10, y: 8}
   cellSize: 1
   numberOfPokemon: 20
+  shuffleTime: 0.3
+  shiftTime: 0.1
   lineRenderer: {fileID: 1502268494}
   tiles:
   - {fileID: 0}
@@ -1438,7 +1440,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  shuffleTime: 0.3
 --- !u!4 &2120761011
 Transform:
   m_ObjectHideFlags: 0

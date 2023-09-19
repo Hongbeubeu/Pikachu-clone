@@ -16,12 +16,17 @@ namespace Pokemon
         Up = 1,
         Right = 2,
         Down = 3,
-        Left = 4
+        Left = 4,
+        UpRight = 5,
+        DownRight = 6,
+        DownLeft = 7,
+        UpLeft = 8,
+        Center = 9,
     }
 
     public class BoardGenerator : MonoBehaviour
     {
-        private static Vector2Int[] _shiftDirections =
+        private static readonly Vector2Int[] _shiftDirections =
         {
             Vector2Int.zero,
             Vector2Int.up,
@@ -279,9 +284,87 @@ namespace Pokemon
                 case ShiftDirection.Left:
                     ShiftLeft();
                     break;
+                case ShiftDirection.UpRight:
+                    ShiftUpRight();
+                    break;
+                case ShiftDirection.DownRight:
+                    ShiftDownRight();
+                    break;
+                case ShiftDirection.DownLeft:
+                    ShiftDownLeft();
+                    break;
+                case ShiftDirection.UpLeft:
+                    ShiftUpLeft();
+                    break;
+                case ShiftDirection.Center:
+                    ShiftCenter();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        private void ShiftCenter()
+        {
+            ShiftCenterVertical();
+            // DOVirtual.DelayedCall(shiftTime, ShiftCenterHorizontal);
+        }
+
+        private void ShiftCenterVertical()
+        {
+            for (var x = 0; x < boardSize.x; x++)
+            {
+                for (var y = boardSize.y / 2 - 1; y >= 0; y--)
+                {
+                    DoShiftCenter(x, y, Vector2Int.up);
+                }
+
+                for (var y = boardSize.y / 2; y < boardSize.y; y++)
+                {
+                    DoShiftCenter(x, y, Vector2Int.down);
+                }
+            }
+        }
+
+        private void ShiftCenterHorizontal()
+        {
+            for (var y = 0; y < boardSize.y; y++)
+            {
+                for (var x = boardSize.x / 2 - 1; x >= 0; x--)
+                {
+                    DoShiftCenter(x, y, Vector2Int.right);
+                }
+
+                for (var x = boardSize.x / 2; x < boardSize.x; x++)
+                {
+                    DoShiftCenter(x, y, Vector2Int.left);
+                }
+            }
+        }
+
+
+        private void ShiftUpLeft()
+        {
+            ShiftUp();
+            DOVirtual.DelayedCall(shiftTime, ShiftLeft);
+        }
+
+        private void ShiftDownLeft()
+        {
+            ShiftDown();
+            DOVirtual.DelayedCall(shiftTime, ShiftLeft);
+        }
+
+        private void ShiftDownRight()
+        {
+            ShiftDown();
+            DOVirtual.DelayedCall(shiftTime, ShiftRight);
+        }
+
+        private void ShiftUpRight()
+        {
+            ShiftUp();
+            DOVirtual.DelayedCall(shiftTime, ShiftRight);
         }
 
         private void ShiftDown()
@@ -290,22 +373,9 @@ namespace Pokemon
             {
                 for (var x = 0; x < boardSize.x; x++)
                 {
-                    DoShift(x, y);
+                    DoShift(x, y, _shiftDirections[(int) ShiftDirection.Down]);
                 }
             }
-        }
-
-        private void DoShift(int x, int y)
-        {
-            var tile = tiles[y * boardSize.x + x];
-            if (tile == null) return;
-            var target = FindEmptyTile(tile.GridPosition, _shiftDirections[(int) _shiftDirection]);
-            if (target == tile.GridPosition) return;
-
-            tiles[GridPositionToIndex(target)] = tile;
-            tiles[GridPositionToIndex(tile.GridPosition)] = null;
-            tile.GridPosition = target;
-            tile.transform.DOMove(GridPositionToWorldPosition(target), shiftTime);
         }
 
         private void ShiftUp()
@@ -314,7 +384,7 @@ namespace Pokemon
             {
                 for (var x = 0; x < boardSize.x; x++)
                 {
-                    DoShift(x, y);
+                    DoShift(x, y, _shiftDirections[(int) ShiftDirection.Up]);
                 }
             }
         }
@@ -325,7 +395,7 @@ namespace Pokemon
             {
                 for (var y = 0; y < boardSize.y; y++)
                 {
-                    DoShift(x, y);
+                    DoShift(x, y, _shiftDirections[(int) ShiftDirection.Left]);
                 }
             }
         }
@@ -336,9 +406,37 @@ namespace Pokemon
             {
                 for (var y = 0; y < boardSize.y; y++)
                 {
-                    DoShift(x, y);
+                    DoShift(x, y, _shiftDirections[(int) ShiftDirection.Right]);
                 }
             }
+        }
+
+        private void DoShiftCenter(int x, int y, Vector2Int direction)
+        {
+            var tile = tiles[y * boardSize.x + x];
+            if (tile == null) return;
+            var target = FindCenterEmptyTile(tile.GridPosition, direction);
+            if (target == tile.GridPosition) return;
+
+            DoSwapAndMoveTile(target, tile);
+        }
+
+        private void DoShift(int x, int y, Vector2Int direction)
+        {
+            var tile = tiles[y * boardSize.x + x];
+            if (tile == null) return;
+            var target = FindEmptyTile(tile.GridPosition, direction);
+            if (target == tile.GridPosition) return;
+
+            DoSwapAndMoveTile(target, tile);
+        }
+
+        private void DoSwapAndMoveTile(Vector2Int target, Tile tile)
+        {
+            tiles[GridPositionToIndex(target)] = tile;
+            tiles[GridPositionToIndex(tile.GridPosition)] = null;
+            tile.GridPosition = target;
+            tile.transform.DOMove(GridPositionToWorldPosition(target), shiftTime);
         }
 
         private Vector2Int FindEmptyTile(Vector2Int currentGridPosition, Vector2Int direction)
@@ -352,6 +450,38 @@ namespace Pokemon
             }
 
             return checkPosition - direction;
+        }
+
+        private Vector2Int FindCenterEmptyTile(Vector2Int currentGridPosition, Vector2Int direction)
+        {
+            if (direction == Vector2Int.up && currentGridPosition.y > boardSize.y / 2)
+                throw new ArgumentException("wtf lmao");
+            if (direction == Vector2Int.down && currentGridPosition.y < boardSize.y / 2)
+                throw new ArgumentException("wtf lmao");
+            if (direction == Vector2Int.right && currentGridPosition.x > boardSize.y / 2)
+                throw new ArgumentException("wtf lmao");
+            if (direction == Vector2Int.left && currentGridPosition.x < boardSize.y / 2)
+                throw new ArgumentException("wtf lmao");
+
+            var checkPosition = currentGridPosition + direction;
+
+            while (!IsCenterTile(checkPosition, direction))
+            {
+                if (tiles[GridPositionToIndex(checkPosition)] != null)
+                    return checkPosition - direction;
+                checkPosition += direction;
+            }
+
+            if (tiles[GridPositionToIndex(checkPosition)] != null)
+                return checkPosition - direction;
+            return checkPosition;
+        }
+
+        private bool IsCenterTile(Vector2Int gridPosition, Vector2Int direction)
+        {
+            if (direction.x != 0)
+                return gridPosition.x == boardSize.x / 2;
+            return gridPosition.y == boardSize.y / 2;
         }
 
         private int GridPositionToIndex(Vector2Int gridPosition)
