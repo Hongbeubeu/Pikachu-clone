@@ -586,10 +586,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: baed452ce808f024ead44e09d432f9d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shiftDirection: 5
-  _shiftIndex: 280
-  _timeDelayDisappear: 0.3
-  _camera: {fileID: 774251656}
+  shiftDirection: 0
+  shiftIndex: 0
+  timeDelayDisappear: 0.3
+  mainCamera: {fileID: 774251656}
   pokemonIcons:
   - {fileID: -1267852245, guid: 13ea170cc7622364f9322a65366492eb, type: 3}
   - {fileID: 874421295, guid: 13ea170cc7622364f9322a65366492eb, type: 3}
@@ -1352,7 +1352,7 @@ MonoBehaviour:
   - {fileID: -1193508352, guid: 13ea170cc7622364f9322a65366492eb, type: 3}
   - {fileID: 1004002699, guid: 13ea170cc7622364f9322a65366492eb, type: 3}
   - {fileID: 0}
-  TilePrefab: {fileID: 7322525021149858699, guid: 1353bb379b2176244b94e2b6ef90287c, type: 3}
+  tilePrefab: {fileID: 7322525021149858699, guid: 1353bb379b2176244b94e2b6ef90287c, type: 3}
   boardSize: {x: 10, y: 8}
   cellSize: 1
   numberOfPokemon: 20

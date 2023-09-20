@@ -26,7 +26,7 @@ namespace Pokemon
 
     public class BoardGenerator : MonoBehaviour
     {
-        private static readonly Vector2Int[] _shiftDirections =
+        private static readonly Vector2Int[] ShiftDirections =
         {
             Vector2Int.zero,
             Vector2Int.up,
@@ -35,12 +35,11 @@ namespace Pokemon
             Vector2Int.left
         };
 
-        [SerializeField] private ShiftDirection _shiftDirection;
-        [SerializeField] private int _shiftIndex = 0;
-        [SerializeField] private float _timeDelayDisappear = 0.3f;
-        [SerializeField] private Camera _camera;
+        [SerializeField] private ShiftDirection shiftDirection;
+        [SerializeField] private float timeDelayDisappear = 0.3f;
+        [SerializeField] private Camera mainCamera;
         [SerializeField] private Sprite[] pokemonIcons;
-        [SerializeField] private Tile TilePrefab;
+        [SerializeField] private Tile tilePrefab;
         [SerializeField] private Vector2Int boardSize = new(10, 10);
         [SerializeField] private float cellSize = 1f;
         [SerializeField] private int numberOfPokemon = 10;
@@ -49,12 +48,11 @@ namespace Pokemon
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private List<Tile> tiles = new();
 
-        private readonly List<int> board = new();
-        private Tile tileHolded;
-        private bool isConnecting;
-        private float matchedCount = 0;
-        private bool isShuffling = false;
-
+        private readonly List<int> _board = new();
+        private Tile _tileHolded;
+        private bool _isConnecting;
+        private float _matchedCount;
+        private bool _isShuffling;
 
         private void OnEnable()
         {
@@ -81,14 +79,23 @@ namespace Pokemon
         private void Generate()
         {
             DeleteChildren();
-            board.Clear();
+            _board.Clear();
             tiles.Clear();
-            for (var i = 0; i < boardSize.x * boardSize.y; i++)
+            var listRandomIcon = new List<int>();
+            do
             {
-                board.Add((i % numberOfPokemon + _shiftIndex) % pokemonIcons.Length);
+                var id = Random.Range(0, pokemonIcons.Length);
+                if (!listRandomIcon.Contains(id))
+                    listRandomIcon.Add(id);
+            } while (listRandomIcon.Count < numberOfPokemon);
+
+
+            for (var i = 0; i < boardSize.x * boardSize.y / numberOfPokemon; i++)
+            {
+                _board.AddRange(listRandomIcon);
             }
 
-            board.Shuffle();
+            _board.Shuffle();
 
             var minX = -(boardSize.x * cellSize / 2f - cellSize / 2f);
             var minY = -(boardSize.y * cellSize / 2f - cellSize / 2f);
@@ -98,9 +105,9 @@ namespace Pokemon
                 position.x = minX;
                 for (var x = 0; x < boardSize.x; x++)
                 {
-                    var pokemon = Instantiate(TilePrefab, transform);
+                    var pokemon = Instantiate(tilePrefab, transform);
                     pokemon.transform.localPosition = position;
-                    var id = board[y * boardSize.x + x];
+                    var id = _board[y * boardSize.x + x];
                     var gridPosition = new Vector2Int(x, y);
                     pokemon.Setup(pokemonIcons[id], id, gridPosition);
                     position.x += cellSize;
@@ -115,20 +122,51 @@ namespace Pokemon
         [Button]
         private void ShuffleBoard()
         {
-            isShuffling = true;
-            DOVirtual.DelayedCall(shuffleTime, () => { isShuffling = false; });
-            var tempTiles = tiles.Where(t => t != null).ToList();
-            tempTiles.Shuffle();
-            for (var i = 0; i < tiles.Count; i++)
+            while (true)
             {
-                if (tiles[i] == null) continue;
+                _isShuffling = true;
+                DOVirtual.DelayedCall(shuffleTime, () => { _isShuffling = false; });
+                var tempTiles = tiles.Where(t => t != null).ToList();
+                tempTiles.Shuffle();
+                for (var i = 0; i < tiles.Count; i++)
+                {
+                    if (tiles[i] == null) continue;
 
-                tiles[i] = tempTiles[0];
-                var gridPosition = new Vector2Int(i % boardSize.x, i / boardSize.x);
-                tiles[i].GridPosition = gridPosition;
-                tiles[i].transform.DOMove(GridPositionToWorldPosition(gridPosition), shuffleTime);
-                tempTiles.RemoveAt(0);
+                    tiles[i] = tempTiles[0];
+                    var gridPosition = new Vector2Int(i % boardSize.x, i / boardSize.x);
+                    tiles[i].GridPosition = gridPosition;
+                    tiles[i].transform.DOMove(GridPositionToWorldPosition(gridPosition), shuffleTime);
+                    tempTiles.RemoveAt(0);
+                }
+
+                if (!CheckHasMatch()) continue;
+                break;
             }
+        }
+
+        private bool CheckHasMatch()
+        {
+            var listChecked = new List<int>();
+            for (var i = 0; i < tiles.Count - 1; i++)
+            {
+                var tile = tiles[i];
+                if (tile == null) continue;
+                if (listChecked.Contains(tile.Id)) continue;
+                for (var j = i + 1; j < tiles.Count; j++)
+                {
+                    if (tiles[j] == null) continue;
+                    if (listChecked.Contains(tiles[j].Id)) continue;
+                    if (tile.Id != tiles[j].Id) continue;
+                    if (CanMatch(tile, tiles[j], out _))
+                    {
+                        return true;
+                    }
+                }
+
+                listChecked.Add(tile.Id);
+            }
+
+            return false;
         }
 
         [Button]
@@ -185,61 +223,61 @@ namespace Pokemon
 
         private void HandleFingerTap(LeanFinger finger)
         {
-            if (isConnecting || isShuffling) return;
+            if (_isConnecting || _isShuffling) return;
 
-            var worldPosition = _camera.ScreenToWorldPoint(finger.ScreenPosition);
+            var worldPosition = mainCamera.ScreenToWorldPoint(finger.ScreenPosition);
 
             if (WorldPositionToGridPosition(worldPosition, out var gridPosition))
             {
                 var tile = GetTile(gridPosition);
                 if (tile == null)
                 {
-                    tileHolded?.OnClick();
-                    tileHolded = null;
+                    _tileHolded?.OnClick();
+                    _tileHolded = null;
                     return;
                 }
 
-                if (tile == tileHolded)
+                if (tile == _tileHolded)
                 {
-                    tileHolded = null;
+                    _tileHolded = null;
                     tile.OnClick();
                     return;
                 }
 
-                if (tileHolded == null)
+                if (_tileHolded == null)
                 {
                     tile.OnClick();
-                    tileHolded = tile;
+                    _tileHolded = tile;
                     return;
                 }
 
-                if (tile.Id != tileHolded.Id)
+                if (tile.Id != _tileHolded.Id)
                 {
-                    tileHolded.OnClick();
-                    tileHolded = null;
+                    _tileHolded.OnClick();
+                    _tileHolded = null;
                     return;
                 }
 
-                if (CanMatch(tileHolded, tile, out List<Vector2Int> path))
+                if (CanMatch(_tileHolded, tile, out List<Vector2Int> path))
                 {
                     StartCoroutine(Clear(tile, path));
                     return;
                 }
 
-                tileHolded.OnClick();
-                tileHolded = null;
+                _tileHolded.OnClick();
+                _tileHolded = null;
             }
             else
             {
-                if (tileHolded == null) return;
-                tileHolded.OnClick();
-                tileHolded = null;
+                if (_tileHolded == null) return;
+                _tileHolded.OnClick();
+                _tileHolded = null;
             }
         }
 
         private IEnumerator Clear(Tile tile, List<Vector2Int> path)
         {
-            isConnecting = true;
+            _isConnecting = true;
             lineRenderer.positionCount = path.Count;
             for (var i = 0; i < path.Count; i++)
             {
@@ -249,26 +287,31 @@ namespace Pokemon
             }
 
             tile.OnClick();
-            yield return new WaitForSeconds(_timeDelayDisappear);
+            yield return new WaitForSeconds(timeDelayDisappear);
             tile.SetActive(false);
-            tileHolded.SetActive(false);
+            _tileHolded.SetActive(false);
             tiles[GridPositionToIndex(tile.GridPosition)] = null;
-            tiles[GridPositionToIndex(tileHolded.GridPosition)] = null;
-            tileHolded = null;
+            tiles[GridPositionToIndex(_tileHolded.GridPosition)] = null;
+            _tileHolded = null;
             lineRenderer.positionCount = 0;
-            isConnecting = false;
-            matchedCount += 2;
+            _isConnecting = false;
+            _matchedCount += 2;
             Shift();
-            if (matchedCount != tiles.Count) yield break;
 
-            _shiftIndex = Random.Range(0, pokemonIcons.Length);
-            matchedCount = 0;
+            if (_matchedCount < tiles.Count)
+            {
+                yield return new WaitForSeconds(shiftTime * 2);
+                if (!CheckHasMatch()) ShuffleBoard();
+                yield break;
+            }
+
+            _matchedCount = 0;
             Generate();
         }
 
         private void Shift()
         {
-            switch (_shiftDirection)
+            switch (shiftDirection)
             {
                 case ShiftDirection.None:
                     break;
@@ -307,7 +350,7 @@ namespace Pokemon
         private void ShiftCenter()
         {
             ShiftCenterVertical();
-            // DOVirtual.DelayedCall(shiftTime, ShiftCenterHorizontal);
+            DOVirtual.DelayedCall(shiftTime, ShiftCenterHorizontal);
         }
 
         private void ShiftCenterVertical()
@@ -319,7 +362,7 @@ namespace Pokemon
                     DoShiftCenter(x, y, Vector2Int.up);
                 }
 
-                for (var y = boardSize.y / 2; y < boardSize.y; y++)
+                for (var y = boardSize.y / 2 + 1; y < boardSize.y; y++)
                 {
                     DoShiftCenter(x, y, Vector2Int.down);
                 }
@@ -335,7 +378,7 @@ namespace Pokemon
                     DoShiftCenter(x, y, Vector2Int.right);
                 }
 
-                for (var x = boardSize.x / 2; x < boardSize.x; x++)
+                for (var x = boardSize.x / 2 + 1; x < boardSize.x; x++)
                 {
                     DoShiftCenter(x, y, Vector2Int.left);
                 }
@@ -373,7 +416,7 @@ namespace Pokemon
             {
                 for (var x = 0; x < boardSize.x; x++)
                 {
-                    DoShift(x, y, _shiftDirections[(int) ShiftDirection.Down]);
+                    DoShift(x, y, ShiftDirections[(int) ShiftDirection.Down]);
                 }
             }
         }
@@ -384,7 +427,7 @@ namespace Pokemon
             {
                 for (var x = 0; x < boardSize.x; x++)
                 {
-                    DoShift(x, y, _shiftDirections[(int) ShiftDirection.Up]);
+                    DoShift(x, y, ShiftDirections[(int) ShiftDirection.Up]);
                 }
             }
         }
@@ -395,7 +438,7 @@ namespace Pokemon
             {
                 for (var y = 0; y < boardSize.y; y++)
                 {
-                    DoShift(x, y, _shiftDirections[(int) ShiftDirection.Left]);
+                    DoShift(x, y, ShiftDirections[(int) ShiftDirection.Left]);
                 }
             }
         }
@@ -406,7 +449,7 @@ namespace Pokemon
             {
                 for (var y = 0; y < boardSize.y; y++)
                 {
-                    DoShift(x, y, _shiftDirections[(int) ShiftDirection.Right]);
+                    DoShift(x, y, ShiftDirections[(int) ShiftDirection.Right]);
                 }
             }
         }
@@ -467,7 +510,13 @@ namespace Pokemon
 
             while (!IsCenterTile(checkPosition, direction))
             {
-                if (tiles[GridPositionToIndex(checkPosition)] != null)
+                var index = GridPositionToIndex(checkPosition);
+                if (index < 0 || index >= tiles.Count)
+                {
+                    Debug.LogError("wtf lmao");
+                }
+
+                if (tiles[index] != null)
                     return checkPosition - direction;
                 checkPosition += direction;
             }
@@ -514,11 +563,9 @@ namespace Pokemon
                         tempPath.Add(toTile.GridPosition);
 
                     var length = CalculateLength(tempPath);
-                    if (length > minLength) return true;
+                    if (length > minLength) continue;
                     minLength = length;
                     path = tempPath;
-
-                    return true;
                 }
             }
 
@@ -537,15 +584,13 @@ namespace Pokemon
                         tempPath.Add(toTile.GridPosition);
 
                     var length = CalculateLength(tempPath);
-                    if (length > minLength) return true;
+                    if (length > minLength) continue;
                     minLength = length;
                     path = tempPath;
-
-                    return true;
                 }
             }
 
-            return false;
+            return path.Count > 0;
         }
 
         private float CalculateLength(List<Vector2Int> path)
