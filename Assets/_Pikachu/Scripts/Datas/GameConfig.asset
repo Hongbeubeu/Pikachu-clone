@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ab7a22d54ba48d996ef2483bee9955e, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
-  boardSize: {x: 10, y: 10}
-  cellSize: 1
+  cellSize: 1.1
   timeDelayDisappear: 0.3
   shuffleTime: 0.3
-  shiftTime: 0.2
+  shiftTime: 0.15

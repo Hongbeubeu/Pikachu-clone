@@ -3,14 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
-using Lean.Touch;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Pokemon
 {
-    public class BoardGenerator : MonoBehaviour
+    public class BoardController : MonoBehaviour
     {
         private static readonly Vector2Int[] ShiftDirections =
         {
@@ -26,6 +25,7 @@ namespace Pokemon
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private List<Tile> tiles = new();
 
+        public bool CanSelect => !(_isConnecting || _isShuffling);
         private Vector2Int BoardSize => currentLevelData.BoardSize;
         private int NumberOfPokemon => currentLevelData.NumberOfPokemon;
         private float _cellSize;
@@ -39,20 +39,10 @@ namespace Pokemon
         private bool _isShuffling;
 
 
-        private void OnEnable()
-        {
-            LeanTouch.OnFingerTap += HandleFingerTap;
-        }
-
-        private void OnDisable()
-        {
-            LeanTouch.OnFingerTap -= HandleFingerTap;
-        }
-
-        private void Start()
+        public void StartGame()
         {
             OnStart();
-            GameManager.Instance.SetCameraSize(currentLevelData.BoardSize.y / 2 + 1);
+            GameManager.Instance.SetCameraSize(currentLevelData.BoardSize.y);
             Generate();
         }
 
@@ -66,16 +56,17 @@ namespace Pokemon
             _shiftTime = GameManager.Instance.GameConfig.ShiftTime;
         }
 
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(transform.position, new Vector3(BoardSize.x, BoardSize.y) * _cellSize);
-        }
-
         [Button(ButtonSizes.Medium)]
         private void Generate()
         {
             if (!Application.isPlaying) return;
+            ClearPreviousBoard();
+            RandomTiles();
+            SpawnBoard();
+        }
+
+        private void ClearPreviousBoard()
+        {
             foreach (var tile in tiles)
             {
                 tile?.ReturnPool();
@@ -83,6 +74,10 @@ namespace Pokemon
 
             _board.Clear();
             tiles.Clear();
+        }
+
+        private void RandomTiles()
+        {
             var listRandomIcon = new List<int>();
             do
             {
@@ -91,14 +86,16 @@ namespace Pokemon
                     listRandomIcon.Add(id);
             } while (listRandomIcon.Count < NumberOfPokemon);
 
-
             for (var i = 0; i < BoardSize.x * BoardSize.y / NumberOfPokemon; i++)
             {
                 _board.AddRange(listRandomIcon);
             }
 
             _board.Shuffle();
+        }
 
+        private void SpawnBoard()
+        {
             var minX = -(BoardSize.x * _cellSize / 2f - _cellSize / 2f);
             var minY = -(BoardSize.y * _cellSize / 2f - _cellSize / 2f);
             var position = new Vector2(minX, minY);
@@ -108,11 +105,11 @@ namespace Pokemon
                 for (var x = 0; x < BoardSize.x; x++)
                 {
                     var tile = GameManager.Instance.ObjectPooler.GetTile();
-                    
+
                     var tileTransform = tile.transform;
                     tileTransform.SetParent(transform);
                     tileTransform.localPosition = position;
-                    
+
                     var index = _board[y * BoardSize.x + x];
                     var gridPosition = new Vector2Int(x, y);
                     tile.Setup(GameManager.Instance.GetIconAtIndex(index), index, gridPosition);
@@ -224,59 +221,53 @@ namespace Pokemon
             return tiles[index];
         }
 
-        private void HandleFingerTap(LeanFinger finger)
+        public void OnTapTile(Vector2Int gridPosition)
         {
-            if (_isConnecting || _isShuffling) return;
-
-            var worldPosition = GameManager.Instance.MainCamera.ScreenToWorldPoint(finger.ScreenPosition);
-
-            if (WorldPositionToGridPosition(worldPosition, out var gridPosition))
-            {
-                var tile = GetTile(gridPosition);
-                if (tile == null)
-                {
-                    if (_tileHolded == null) return;
-                    _tileHolded.OnClick();
-                    _tileHolded = null;
-                    return;
-                }
-
-                if (tile == _tileHolded)
-                {
-                    _tileHolded = null;
-                    tile.OnClick();
-                    return;
-                }
-
-                if (_tileHolded == null)
-                {
-                    tile.OnClick();
-                    _tileHolded = tile;
-                    return;
-                }
-
-                if (tile.Id != _tileHolded.Id)
-                {
-                    _tileHolded.OnClick();
-                    _tileHolded = null;
-                    return;
-                }
-
-                if (CanMatch(_tileHolded, tile, out List<Vector2Int> path))
-                {
-                    StartCoroutine(Clear(tile, path));
-                    return;
-                }
-
-                _tileHolded.OnClick();
-                _tileHolded = null;
-            }
-            else
+            var tile = GetTile(gridPosition);
+            if (tile == null)
             {
                 if (_tileHolded == null) return;
                 _tileHolded.OnClick();
                 _tileHolded = null;
+                return;
             }
+
+            if (tile == _tileHolded)
+            {
+                _tileHolded = null;
+                tile.OnClick();
+                return;
+            }
+
+            if (_tileHolded == null)
+            {
+                tile.OnClick();
+                _tileHolded = tile;
+                return;
+            }
+
+            if (tile.Id != _tileHolded.Id)
+            {
+                _tileHolded.OnClick();
+                _tileHolded = null;
+                return;
+            }
+
+            if (CanMatch(_tileHolded, tile, out List<Vector2Int> path))
+            {
+                StartCoroutine(Clear(tile, path));
+                return;
+            }
+
+            _tileHolded.OnClick();
+            _tileHolded = null;
+        }
+
+        public void OnTapEmptyTile()
+        {
+            if (_tileHolded == null) return;
+            _tileHolded.OnClick();
+            _tileHolded = null;
         }
 
         private IEnumerator Clear(Tile tile, List<Vector2Int> path)
@@ -313,6 +304,7 @@ namespace Pokemon
             Generate();
         }
 
+        //TODO Use strategy pattern
         private void Shift()
         {
             switch (shiftDirection)

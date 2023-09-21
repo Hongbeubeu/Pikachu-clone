@@ -29,7 +29,7 @@ namespace Pokemon
 
         public void SetCameraSize(int height)
         {
-            mainCamera.orthographicSize = height + 1;
+            mainCamera.orthographicSize = height * GameConfig.CellSize / 2 + 1;
         }
     }
 }
