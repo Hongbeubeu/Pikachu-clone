@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.madsbangh.easybuttons": "https://github.com/madsbangh/EasyButtons.git#upm",
+    "com.ultimate.core": "https://github.com/Hongbeubeu/Ultimate-Core.git",
     "com.unity.collab-proxy": "1.15.18",
     "com.unity.feature.2d": "1.0.0",
     "com.unity.feature.development": "1.0.1",
