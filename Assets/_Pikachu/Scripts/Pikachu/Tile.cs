@@ -24,13 +24,14 @@ namespace Pokemon
             icon.sprite = sprite;
             this.id = id;
             this.gridPosition = gridPosition;
+            Reset();
         }
 
-        public void SetActive(bool isActive)
+        private void Reset()
         {
-            gameObject.SetActive(isActive);
+            OnDeselect();
         }
-        
+
         private void OnSelect()
         {
             isSelected = true;
@@ -49,6 +50,11 @@ namespace Pokemon
                 OnDeselect();
             else
                 OnSelect();
+        }
+
+        public void ReturnPool()
+        {
+            GameManager.Instance.ObjectPooler.ReturnPoolTile(gameObject);
         }
     }
 }

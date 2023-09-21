@@ -4,7 +4,8 @@
     "references": [
         "EasyButtons",
         "LeanTouch",
-        "LeanCommon"
+        "LeanCommon",
+        "com.ultimate.core.runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
