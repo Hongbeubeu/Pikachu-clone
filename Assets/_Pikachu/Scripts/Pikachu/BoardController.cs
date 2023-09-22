@@ -20,14 +20,15 @@ namespace Pokemon
             Vector2Int.left
         };
 
-        [SerializeField] private LevelData currentLevelData;
-        [SerializeField] private ShiftDirection shiftDirection;
         [SerializeField] private LineRenderer lineRenderer;
         [SerializeField] private List<Tile> tiles = new();
 
         public bool CanSelect => !(_isConnecting || _isShuffling);
-        private Vector2Int BoardSize => currentLevelData.BoardSize;
-        private int NumberOfPokemon => currentLevelData.NumberOfPokemon;
+        private Vector2Int BoardSize => _currentLevelData.BoardSize;
+        private int NumberOfPokemon => _currentLevelData.NumberOfPokemon;
+
+        private LevelData _currentLevelData;
+        private ShiftDirection _shiftDirection;
         private float _cellSize;
         private float _timeDelayDisappear;
         private float _shuffleTime;
@@ -37,12 +38,12 @@ namespace Pokemon
         private bool _isConnecting;
         private float _matchedCount;
         private bool _isShuffling;
-
+        private int _currentLevel;
 
         public void StartGame()
         {
             OnStart();
-            GameManager.Instance.SetCameraSize(currentLevelData.BoardSize.y);
+            GameManager.Instance.SetCameraSize(_currentLevelData.BoardSize.y);
             Generate();
         }
 
@@ -54,6 +55,9 @@ namespace Pokemon
             _timeDelayDisappear = GameManager.Instance.GameConfig.TimeDelayDisappear;
             _shuffleTime = GameManager.Instance.GameConfig.ShuffleTime;
             _shiftTime = GameManager.Instance.GameConfig.ShiftTime;
+            _currentLevel = GameController.Instance.CurrentLevel;
+            _currentLevelData = GameManager.Instance.GetLevelData(_currentLevel);
+            _shiftDirection = _currentLevelData.ShiftDirection;
         }
 
         [Button(ButtonSizes.Medium)]
@@ -67,9 +71,9 @@ namespace Pokemon
 
         private void ClearPreviousBoard()
         {
-            foreach (var tile in tiles)
+            foreach (var tile in tiles.Where(tile => tile != null))
             {
-                tile?.ReturnPool();
+                tile.ReturnPool();
             }
 
             _board.Clear();
@@ -301,13 +305,13 @@ namespace Pokemon
             }
 
             _matchedCount = 0;
-            Generate();
+            GameController.Instance.LevelUp();
         }
 
         //TODO Use strategy pattern
         private void Shift()
         {
-            switch (shiftDirection)
+            switch (_shiftDirection)
             {
                 case ShiftDirection.None:
                     break;
@@ -693,7 +697,7 @@ namespace Pokemon
             {
                 var checkPosition = fromPositon + (i + 1) * step;
                 if (!IsInsideBoard(GridPositionToWorldPosition(checkPosition)))
-                    continue; //TODO Need to check bound of board
+                    continue;
                 if (GetTile(checkPosition) != null)
                 {
                     return false;

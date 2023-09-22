@@ -8,5 +8,17 @@ namespace Pokemon
         [SerializeField] private LevelData[] levelDatas;
 
         public LevelData[] LevelDatas => levelDatas;
+
+
+        public LevelData GetLevelData(int level)
+        {
+            level %= levelDatas.Length;
+            return LevelDatas[level];
+        }
+
+        public int GetMaxLevel()
+        {
+            return LevelDatas.Length;
+        }
     }
 }

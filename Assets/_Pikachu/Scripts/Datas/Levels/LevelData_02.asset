@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boardSize: {x: 8, y: 6}
   numberOfPokemon: 12
+  shiftDirection: 3

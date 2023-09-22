@@ -7,8 +7,10 @@ namespace Pokemon
     {
         [SerializeField] private Vector2Int boardSize;
         [SerializeField] private int numberOfPokemon;
+        [SerializeField] private ShiftDirection shiftDirection;
 
         public Vector2Int BoardSize => boardSize;
         public int NumberOfPokemon => numberOfPokemon;
+        public ShiftDirection ShiftDirection => shiftDirection;
     }
 }

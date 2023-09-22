@@ -16,6 +16,7 @@ namespace Pokemon
         public ObjectPooler ObjectPooler => objectPooler;
         public LevelDatabase LevelDatabase => levelDatabase;
         public int PokemonCount => pokemonIcons.Length;
+        public int MaxLevel => LevelDatabase.GetMaxLevel();
 
         public override void Init()
         {
@@ -30,6 +31,11 @@ namespace Pokemon
         public void SetCameraSize(int height)
         {
             mainCamera.orthographicSize = height * GameConfig.CellSize / 2 + 1;
+        }
+
+        public LevelData GetLevelData(int level)
+        {
+            return LevelDatabase.GetLevelData(level);
         }
     }
 }
